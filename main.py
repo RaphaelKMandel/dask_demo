@@ -47,5 +47,3 @@ if __name__ == "__main__":
     manager = Manager({"task1": task1, "task2": task2})
     manager.tasks.put((task1, {"x": 1}))
     manager.main_loop()
-
-    # result_collector()
