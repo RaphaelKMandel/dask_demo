@@ -2,28 +2,36 @@ from time import sleep
 from random import choice
 from multiprocessing import Pool
 from numpy import random
+from numba import njit
+
+@njit
+def iterate(x):
+    Ny, Nx = x.shape
+    for i in range(1, Nx-1):
+        for j in range(1, Ny-1):
+            x[j,i] = 0.25 * (x[j,i-1] + x[j,i+1] + x[j-1, i] + x[j+1, i])
+
+    return x
 
 
 class Physics:
-    def __init__(self, x):
-        self.x = x
-        self.array = x * random.random(size=(1000, 1000))
+    def __init__(self):
+        self.array = random.random(size=(1000, 2000))
 
     def solve(self):
-        print("solving with", str(self.x)[:10])
-        for i in range(100):
-            self.x += self.array.sum() / 1e6
-            self.array -= self.x
+        print("solving with", str(self.array)[:10])
+        for i in range(10):
+            self.array = iterate(self.array)
 
-        return self.array + self.x
+        return self.array
 
     def callback(self, result):
         print("callback with ", str(result)[:10])
-        self.x = result
+        self.array = result
 
 
 if __name__ == "__main__":
-    physics = [Physics(i) for i in [1, 10, 100, 1000]]
+    physics = [Physics() for i in [1, 10, 100, 1000]]
     pool = Pool(processes=4)
     for i in range(100):
         results = []
